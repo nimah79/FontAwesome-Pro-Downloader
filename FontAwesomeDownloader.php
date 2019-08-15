@@ -3,12 +3,10 @@
 /**
  * FontAwesome Pro Downloader
  * By NimaH79
- * http://nimah79.ir
+ * http://nimah79.ir.
  */
-
 class FontAwesomeDownloader
 {
-
     private $base_url = 'https://kit-pro.fontawesome.com';
 
     private $version;
@@ -24,7 +22,7 @@ class FontAwesomeDownloader
             $this->version = $version;
         }
         if (is_null($download_path)) {
-            $this->download_path = __DIR__ . '/fontawesome_v' . $this->version . '_pro';
+            $this->download_path = __DIR__.'/fontawesome_v'.$this->version.'_pro';
         } else {
             $this->download_path = rtrim($download_path, '/');
         }
@@ -33,20 +31,20 @@ class FontAwesomeDownloader
 
     public function download()
     {
-        $css_base_url = $this->base_url . '/releases/v' . $this->version . '/css';
-        $fonts_path = $this->download_path . '/fonts';
-        $css = $this->curlRequest($css_base_url . '/pro.min.css')['response'];
+        $css_base_url = $this->base_url.'/releases/v'.$this->version.'/css';
+        $fonts_path = $this->download_path.'/fonts';
+        $css = $this->curlRequest($css_base_url.'/pro.min.css')['response'];
         file_exists($fonts_path) || mkdir($fonts_path, 0755, true);
         foreach ($this->extractCssPaths($css) as $path) {
             $font_url = $path;
             if (filter_var($path, FILTER_VALIDATE_URL) === false) {
-                $font_url = $this->normalizeUrl($css_base_url . '/' . $path);
+                $font_url = $this->normalizeUrl($css_base_url.'/'.$path);
             }
             $font_name = preg_replace('/\??#(iefix|fontawesome)/', '', basename($path));
-            $this->curlDownloadFile($font_url, $fonts_path . '/' . $font_name);
-            $css = str_replace($path, 'fonts/' . preg_replace('/\??#(iefix|fontawesome)/', '?#$1', basename($path)), $css);
+            $this->curlDownloadFile($font_url, $fonts_path.'/'.$font_name);
+            $css = str_replace($path, 'fonts/'.preg_replace('/\??#(iefix|fontawesome)/', '?#$1', basename($path)), $css);
         }
-        file_put_contents($this->download_path . '/pro.min.css', $css);
+        file_put_contents($this->download_path.'/pro.min.css', $css);
     }
 
     private function curlRequest($url)
@@ -56,12 +54,12 @@ class FontAwesomeDownloader
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false,
-            CURLOPT_USERAGENT => 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.67 Safari/537.36'
+            CURLOPT_USERAGENT      => 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.67 Safari/537.36',
         ]);
         $response = curl_exec($ch);
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
-    
+
         return ['response' => $response, 'http_code' => $http_code];
     }
 
@@ -88,7 +86,7 @@ class FontAwesomeDownloader
     {
         $parsed_url = parse_url($url);
 
-        return $parsed_url['scheme'] . '://' . $parsed_url['host'] . $this->normalizePath($parsed_url['path']);
+        return $parsed_url['scheme'].'://'.$parsed_url['host'].$this->normalizePath($parsed_url['path']);
     }
 
     private function normalizePath($path)
@@ -98,13 +96,13 @@ class FontAwesomeDownloader
         for ($i = 0; $i < count($parts); $i++) {
             if ($parts[$i] === '..') {
                 if ($i === 0) {
-                    throw new Exception('Cannot resolve path, path seems invalid: ' . $path);
+                    throw new Exception('Cannot resolve path, path seems invalid: '.$path);
                 }
                 unset($parts[$i - 1]);
                 unset($parts[$i]);
                 $parts = array_values($parts);
                 $i -= 2;
-            } else if ($parts[$i] === '.') {
+            } elseif ($parts[$i] === '.') {
                 unset($parts[$i]);
                 $parts = array_values($parts);
                 $i -= 1;
@@ -114,7 +112,7 @@ class FontAwesomeDownloader
                 $parts = array_values($parts);
             }
         }
+
         return implode('/', $parts);
     }
-
 }
